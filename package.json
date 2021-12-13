@@ -1,7 +1,7 @@
 {
   "name": "forming",
-  "version": "1.0.0",
-  "description": "Made with create-react-library",
+  "version": "0.0.1",
+  "description": "Build forms with smile",
   "author": "liqiang372",
   "license": "MIT",
   "repository": "liqiang372/forming",
