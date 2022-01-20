@@ -51,7 +51,7 @@ export class FormState {
   }
 
   subscribe(name: string | undefined, fn: (val: any) => void) {
-    const key = name ?? ALL_KEY;
+    const key = name ?? (ALL_KEY as any);
     this.listeners[key] = fn;
     return () => {
       delete this.listeners[key];
