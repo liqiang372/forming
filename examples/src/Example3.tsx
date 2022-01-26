@@ -24,6 +24,9 @@ export function Example3() {
     <div className="flex flex-col items-start">
       <h2 className="text-2xl">async validating</h2>
       <Form
+        initialValues={{
+          email: 'hello@demo.com',
+        }}
         validateOnSubmit
         onSubmit={({ values }) => {
           console.log('submitting', values);

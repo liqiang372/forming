@@ -87,7 +87,7 @@ export class FormState {
         ) {
           errors.push({
             rule: 'required',
-            message: rule,
+            message: handler,
           });
           continue;
         }

@@ -75,7 +75,7 @@ export function Field({
   };
 
   return children({
-    value,
+    value: initialValue,
     onChange,
     onBlur,
     updateValue,
