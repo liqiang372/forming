@@ -6,6 +6,7 @@ import { FormInitialValues } from './types';
 export interface FormProps {
   initialValues?: FormInitialValues;
   validateOnSubmit?: boolean;
+  validateOnSubmitSyncOnly?: boolean;
   htmlValidate?: boolean;
   children: React.ReactNode;
   onSubmit?: (params: any) => void; // TODO: fix type
@@ -15,6 +16,7 @@ export function Form({
   children,
   htmlValidate = false,
   validateOnSubmit,
+  validateOnSubmitSyncOnly,
   onSubmit,
 }: FormProps) {
   const formState = useRef<FormState>(new FormState({ initialValues }));
@@ -23,6 +25,10 @@ export function Form({
     e.preventDefault();
     if (validateOnSubmit) {
       await formState.current.validateAll();
+    } else if (validateOnSubmitSyncOnly) {
+      await formState.current.validateAll({
+        syncOnly: true,
+      });
     }
     const hasErrors = Object.keys(formState.current.getErrors()).length > 0;
     if (!hasErrors) {

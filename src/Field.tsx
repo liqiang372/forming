@@ -1,19 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useFormContext, useFormErrors } from './FormContext';
-
+import { useDebouncedCallback } from 'use-debounce';
 interface FieldChildParams {
   value: any;
   onChange: (e: React.ChangeEvent<any>) => void;
   onBlur: (e: React.FocusEvent<any>) => void;
   updateValue: (val: any) => void;
   errors?: { rule: string; message?: string }[];
+  isValidating: boolean;
 }
 export interface FieldProps {
   name: string;
   children: (params: FieldChildParams) => React.ReactElement;
-  validate?: Record<string, string | ((val: any) => boolean | string)>;
+  validate?: Record<
+    string,
+    string | ((val: any) => boolean | string | Promise<boolean | string>)
+  >;
   validateOnChange?: boolean;
   validateOnBlur?: boolean;
+  validateDebouncedTime?: number;
 }
 
 export function Field({
@@ -22,11 +27,22 @@ export function Field({
   validate,
   validateOnBlur = false,
   validateOnChange = false,
+  validateDebouncedTime,
 }: FieldProps) {
   const { formState } = useFormContext();
   const { errors } = useFormErrors(name);
   const initialValue = formState.getValue(name);
   const [value, setValue] = useState<any>(initialValue ?? '');
+  const [isValidating, setIsValidating] = useState(false);
+  const validateFn = validateDebouncedTime
+    ? useDebouncedCallback(async () => {
+        setIsValidating(true);
+        await formState.validate(name);
+        setIsValidating(false);
+      }, validateDebouncedTime)
+    : useCallback((name: string) => {
+        formState.validate(name);
+      }, []);
 
   useEffect(() => {
     if (validate) {
@@ -40,7 +56,7 @@ export function Field({
     setValue(val);
     formState.setValue(name, val);
     if (validate && validateOnChange) {
-      formState.validate(name);
+      validateFn(name);
     }
   };
 
@@ -48,7 +64,7 @@ export function Field({
     setValue(val);
     formState.setValue(name, val);
     if (validate) {
-      formState.validate(name);
+      validateFn(name);
     }
   };
 
@@ -64,5 +80,6 @@ export function Field({
     onBlur,
     updateValue,
     errors,
+    isValidating,
   });
 }

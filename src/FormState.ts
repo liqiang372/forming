@@ -67,7 +67,7 @@ export class FormState {
     this.validateRules[name] = rules;
   }
 
-  async validate(name: string) {
+  async validate(name: string, syncOnly?: boolean) {
     const rules = this.validateRules[name];
     if (rules) {
       const errors = [];
@@ -92,7 +92,16 @@ export class FormState {
           continue;
         }
         if (typeof handler === 'function') {
-          const res = await handler(val ?? '');
+          let res = undefined;
+          if (handler.constructor.name === 'AsyncFunction') {
+            if (!syncOnly) {
+              res = await handler(val ?? '');
+            } else {
+              continue;
+            }
+          } else {
+            res = handler(val ?? '');
+          }
           if (!['boolean', 'string'].includes(typeof res)) {
             throw new Error('Expect Boolean or String from validation handler');
           }
@@ -111,8 +120,8 @@ export class FormState {
     }
   }
 
-  async validateAll() {
+  async validateAll({ syncOnly }: { syncOnly?: boolean } = {}) {
     const names = Object.keys(this.validateRules);
-    await Promise.allSettled(names.map(name => this.validate(name)));
+    await Promise.allSettled(names.map(name => this.validate(name, syncOnly)));
   }
 }
