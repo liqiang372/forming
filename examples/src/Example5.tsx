@@ -1,27 +1,37 @@
-# forming
-
-> Made with create-react-library
-
-[![NPM](https://img.shields.io/npm/v/forming.svg)](https://www.npmjs.com/package/forming) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
-
-## Install
-
-```bash
-npm install --save forming
-```
-
-## Usage
-
-```tsx
+import { useState } from 'react';
 import { Form, Field } from 'forming';
 
-export function Example() {
+function checkUsername(name: string) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      console.log('async validating');
+      if (['foo', 'bar', 'baz'].includes(name)) {
+        resolve('invalid');
+      } else {
+        resolve('valid');
+      }
+    }, 500);
+  });
+}
+function SubmitBtn() {
+  return (
+    <button type="submit" className="btn">
+      Submit
+    </button>
+  );
+}
+
+export function Example5() {
   return (
     <div className="flex flex-col items-start">
-      <h2 className="text-2xl">async validating</h2>
+      <h2 className="text-2xl">Arrays</h2>
       <Form
         initialValues={{
           email: 'hello@demo.com',
+          social: {
+            facebook: 'facebook.com/profile',
+            twitter: 'twitter.com/awesome',
+          },
         }}
         validateOnSubmit
         onSubmit={({ values }) => {
@@ -91,13 +101,34 @@ export function Example() {
             );
           }}
         </Field>
+        <div className="flex flex-col items-start mt-4">
+          <label htmlFor="">Social</label>
+          <Field name="social.facebook">
+            {({ value = '', onChange }) => {
+              return (
+                <input
+                  value={value}
+                  onChange={onChange}
+                  className="border border-black border-solid"
+                />
+              );
+            }}
+          </Field>
+          <Field name="social.twitter">
+            {({ value = '', onChange }) => {
+              return (
+                <input
+                  value={value}
+                  onChange={onChange}
+                  className="mt-2 border border-black border-solid"
+                />
+              );
+            }}
+          </Field>
+        </div>
+
         <SubmitBtn />
       </Form>
     </div>
   );
 }
-```
-
-## License
-
-MIT © [liqiang372](https://github.com/liqiang372)

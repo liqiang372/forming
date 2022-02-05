@@ -27,7 +27,7 @@ export function Example3() {
         initialValues={{
           email: 'hello@demo.com',
         }}
-        validateOnSubmit
+        validateOnSubmitSyncOnly
         onSubmit={({ values }) => {
           console.log('submitting', values);
         }}
