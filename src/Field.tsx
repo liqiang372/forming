@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useFormContext, useFormErrors } from './FormContext';
+import { useForm, useFormErrors } from './FormContext';
 import { useDebouncedCallback } from 'use-debounce';
 interface FieldChildParams {
   value: any;
@@ -29,7 +29,7 @@ export function Field({
   validateOnChange = false,
   validateDebouncedTime,
 }: FieldProps) {
-  const { formState } = useFormContext();
+  const { formState } = useForm();
   const { errors } = useFormErrors(name);
   const initialValue = formState.getValue(name);
   const [value, setValue] = useState<any>(initialValue ?? '');

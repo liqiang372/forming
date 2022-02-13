@@ -9,11 +9,11 @@ export const FormContext = React.createContext<FormContextState>({
   formState: new FormState({}),
 });
 
-export const useFormContext = () => React.useContext(FormContext);
+export const useForm = () => React.useContext(FormContext);
 
 export const useFormErrors = (name: string) => {
   const [errors, setErrors] = useState<undefined | FieldError[]>(undefined);
-  const { formState } = useFormContext();
+  const { formState } = useForm();
 
   useEffect(() => {
     const unsubscribe = formState.subscribe(name, errors => {
