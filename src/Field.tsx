@@ -19,6 +19,7 @@ export interface FieldProps {
   validateOnChange?: boolean;
   validateOnBlur?: boolean;
   validateDebouncedTime?: number;
+  type?: 'checkbox' // TODO: Support all HTMLInputTypeAttribute types
 }
 
 export function Field({
@@ -28,6 +29,7 @@ export function Field({
   validateOnBlur = false,
   validateOnChange = false,
   validateDebouncedTime,
+  type
 }: FieldProps) {
   const { formState } = useForm();
   const { errors } = useFormErrors(name);
@@ -52,7 +54,7 @@ export function Field({
 
   const onChange = (e: React.ChangeEvent<any>) => {
     e.stopPropagation();
-    const val = e.target.value;
+    const val = type === 'checkbox' ? e.target.checked : e.target.value;
     setValue(val);
     formState.setValue(name, val);
     if (validate && validateOnChange) {
