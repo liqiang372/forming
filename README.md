@@ -74,13 +74,16 @@ export function Example() {
           }}
           validateOnChange
         >
-          {({ value = '', onChange, errors, isValidating }) => {
+          {({ value = '', updateValue, errors, isValidating }) => {
             return (
               <div className="flex flex-col items-start">
                 <label htmlFor="">Username</label>
                 <input
                   value={value}
-                  onChange={onChange}
+                  onChange={e => {
+                    // don't have to use preset "onChange" for flexible update
+                    updateValue(e.target.value);
+                  }}
                   className="border border-black border-solid"
                 />
                 {errors && errors.length > 0 && (
