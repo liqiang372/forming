@@ -1,5 +1,5 @@
 import { FormInitialValues, ValidationLevel } from './types';
-import { isEmpty, parseArrayLikeName, parseObjectLikeName } from './utils';
+import { isEmpty, parsePath } from './utils';
 
 const ALL_KEY = Symbol('all');
 export class FormState {
@@ -29,24 +29,15 @@ export class FormState {
   }
 
   setValue(rawName: string, value: any) {
-    const { name, index } = parseArrayLikeName(rawName);
-    if (index !== undefined) {
-      this.values[name][index] = value;
-      return;
-    }
-    const paths = parseObjectLikeName(rawName);
+    const paths = parsePath(rawName);
     let tmp = this.values;
     for (let i = 0; i < paths.length - 1; i++) {
       tmp = this.values[paths[i]];
     }
     tmp[paths[paths.length - 1]] = value;
   }
-  getValue(rawName: string) {
-    const { name, index } = parseArrayLikeName(rawName);
-    if (index !== undefined) {
-      return this.values[name][index];
-    }
-    const paths = parseObjectLikeName(rawName);
+  getValue(rawName: string): any {
+    const paths = parsePath(rawName);
     let value = this.values;
     for (const path of paths) {
       value = value[path];
