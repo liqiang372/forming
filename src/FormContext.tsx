@@ -11,17 +11,28 @@ export const FormContext = React.createContext<FormContextState>({
 
 export const useForm = () => React.useContext(FormContext);
 
-export const useFormErrors = (name: string) => {
+export const useFormError = (name: string | undefined) => {
   const [errors, setErrors] = useState<undefined | FieldError[]>(undefined);
   const { formState } = useForm();
 
   useEffect(() => {
-    const unsubscribe = formState.subscribe(name, errors => {
+    const unsubscribe = formState.subscribeErrors(name, errors => {
       setErrors(errors);
     });
     return unsubscribe;
   });
-  return {
-    errors,
-  };
+  return errors;
+};
+
+export const useFormValue = (name: string) => {
+  const [value, setValue] = useState<undefined | any>(undefined);
+  const { formState } = useForm();
+
+  useEffect(() => {
+    const unsubscribe = formState.subscribeValues(name, value => {
+      setValue(value);
+    });
+    return unsubscribe;
+  });
+  return value;
 };

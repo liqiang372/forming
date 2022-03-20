@@ -10,7 +10,10 @@ export class FormState {
   private values: FormInitialValues;
   private validateRules: Record<string, any>;
   private errors: Record<string, any>;
-  private listeners: Record<string | symbol, (params: any) => void>;
+  private listeners: Record<
+    string | symbol,
+    { errors: ((errors: string[]) => void)[]; values: ((value: any) => void)[] }
+  >;
   constructor({
     initialValues = {},
     validationLevel = 'first',
@@ -35,6 +38,10 @@ export class FormState {
       tmp = this.values[paths[i]];
     }
     tmp[paths[paths.length - 1]] = value;
+    // TODO: deal with array or object
+    for (const listener of this.listeners[rawName]?.values ?? []) {
+      listener(value);
+    }
   }
   getValue(rawName: string): any {
     const paths = parsePath(rawName);
@@ -61,17 +68,46 @@ export class FormState {
     this.notifyErrors(name);
   }
 
-  subscribe(name: string | undefined, fn: (val: any) => void) {
+  subscribeErrors(name: string | undefined, fn: (errors: any[]) => void) {
+    return this.subscribe(name, 'errors', fn);
+  }
+
+  subscribeValues(name: string | undefined, fn: (values: any[]) => void) {
+    return this.subscribe(name, 'values', fn);
+  }
+
+  private subscribe(
+    name: string | undefined,
+    category: 'errors' | 'values',
+    fn: (val: any) => void,
+  ) {
     const key = name ?? (ALL_KEY as any);
-    this.listeners[key] = fn;
+    if (!this.listeners[key]) {
+      this.listeners[key] = { errors: [], values: [] };
+    }
+    if (!this.listeners[key][category]) {
+      this.listeners[key][category] = [];
+    }
+
+    this.listeners[key][category].push(fn);
     return () => {
-      delete this.listeners[key];
+      let i = 0;
+      while (i < this.listeners[key][category].length) {
+        const listener = this.listeners[key][category][i];
+        if (listener === fn) {
+          break;
+        }
+        i++;
+      }
+      this.listeners[key][category].splice(i, 1);
     };
   }
 
   notifyErrors(name: string) {
-    const fn = this.listeners[name];
-    fn?.(this.errors[name]);
+    const subs = this.listeners[name];
+    for (const sub of subs.errors) {
+      sub(this.errors[name]);
+    }
   }
 
   setValidateRules(name: string, rules: any) {
