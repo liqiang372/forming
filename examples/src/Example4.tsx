@@ -21,41 +21,95 @@ function SubmitBtn() {
   );
 }
 
-function BooksRegistration({ initialBooks }: { initialBooks: string[] }) {
-  const [bookCount, setBookCount] = useState(initialBooks.length);
+function BooksRegistration({
+  books,
+}: {
+  books: { title: string; author: string }[];
+}) {
   return (
     <div className="flex flex-col items-start mt-4">
-      {Array(bookCount)
-        .fill(0)
-        .map((_, index) => {
+      <Field name="books">
+        {({ value: books = [], updateValue: updateBooksValue }) => {
           return (
-            <Field name={`books[${index}]`} key={index}>
-              {({ value = '', onChange }) => {
+            <>
+              {books.map((book: any, index: number) => {
                 return (
-                  <input
-                    type="text"
-                    value={value}
-                    onChange={onChange}
-                    className="border border-black border-solid"
-                  />
+                  <div key={index}>
+                    <Field name={`books[${index}].title`}>
+                      {({ value = '', updateValue }) => {
+                        return (
+                          <div>
+                            <label htmlFor="">title</label>
+                            <input
+                              type="text"
+                              value={value}
+                              onChange={e => {
+                                updateValue(e.target.value);
+                              }}
+                              className="border border-black border-solid"
+                            />
+                          </div>
+                        );
+                      }}
+                    </Field>
+                    <Field name={`books[${index}].author`}>
+                      {({ value, updateValue }) => {
+                        return (
+                          <div>
+                            <label htmlFor="">author</label>
+                            <input
+                              type="text"
+                              value={value}
+                              onChange={e => {
+                                updateValue(e.target.value);
+                              }}
+                              className="border border-black border-solid"
+                            />
+                          </div>
+                        );
+                      }}
+                    </Field>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updatedBooks = [
+                          ...books.slice(0, index),
+                          ...books.slice(index + 1),
+                        ];
+                        updateBooksValue(updatedBooks);
+                      }}
+                    >
+                      X
+                    </button>
+                  </div>
                 );
-              }}
-            </Field>
+              })}
+              <button
+                type="button"
+                onClick={() => {
+                  updateBooksValue(books.concat({ title: '', author: '' }));
+                }}
+              >
+                add more
+              </button>
+            </>
           );
-        })}
-      <button
-        type="button"
-        onClick={() => {
-          setBookCount(prev => prev + 1);
         }}
-      >
-        add more
-      </button>
+      </Field>
     </div>
   );
 }
 export function Example4() {
-  const books = ['book 1', 'book 2', 'book 3'];
+  const books = [
+    {
+      title: 'book 1',
+      author: 'author 1',
+    },
+    {
+      title: 'book 2',
+      author: 'author 2',
+    },
+  ];
   return (
     <div className="flex flex-col items-start">
       <h2 className="text-2xl">Arrays</h2>
@@ -132,7 +186,7 @@ export function Example4() {
             );
           }}
         </Field>
-        <BooksRegistration initialBooks={books} />
+        <BooksRegistration books={books} />
 
         <SubmitBtn />
       </Form>

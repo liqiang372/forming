@@ -35,7 +35,7 @@ export class FormState {
     const paths = parsePath(rawName);
     let tmp = this.values;
     for (let i = 0; i < paths.length - 1; i++) {
-      tmp = this.values[paths[i]];
+      tmp = tmp[paths[i]];
     }
     tmp[paths[paths.length - 1]] = value;
     // TODO: deal with array or object
