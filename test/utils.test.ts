@@ -1,4 +1,4 @@
-import { parsePath } from './utils';
+import { parsePath } from '../src/utils';
 
 describe('utils', () => {
   describe('parsePath', () => {

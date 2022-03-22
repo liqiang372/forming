@@ -15,6 +15,6 @@
     "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["src"],
+  "include": ["src", "test/utils.test.ts", "test/Form.test.tsx"],
   "exclude": ["node_modules", "dist", "example"]
 }
