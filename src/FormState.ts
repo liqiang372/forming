@@ -2,12 +2,12 @@ import { FormInitialValues, ValidationLevel } from './types';
 import { isEmpty, parsePath } from './utils';
 
 const ALL_KEY = Symbol('all');
-export class FormState {
+export class FormState<T extends FormInitialValues> {
   options: {
-    initialValues: FormInitialValues;
+    initialValues: T;
     validationLevel: ValidationLevel;
   };
-  private values: FormInitialValues;
+  private values: T;
   private validateRules: Record<string, any>;
   private errors: Record<string, any>;
   private listeners: Record<
@@ -15,10 +15,10 @@ export class FormState {
     { errors: ((errors: string[]) => void)[]; values: ((value: any) => void)[] }
   >;
   constructor({
-    initialValues = {},
+    initialValues = {} as T,
     validationLevel = 'first',
   }: {
-    initialValues?: FormInitialValues;
+    initialValues?: T;
     validationLevel?: ValidationLevel;
   }) {
     this.options = {
@@ -37,6 +37,7 @@ export class FormState {
     for (let i = 0; i < paths.length - 1; i++) {
       tmp = tmp[paths[i]];
     }
+    // @ts-ignore
     tmp[paths[paths.length - 1]] = value;
     // TODO: deal with array or object
     for (const listener of this.listeners[rawName]?.values ?? []) {

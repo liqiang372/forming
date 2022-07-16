@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { FormState } from './FormState';
 import { FieldError } from './types';
 
-export interface FormContextState {
-  formState: FormState;
+export interface FormContextState<T> {
+  formState: FormState<T>;
 }
-export const FormContext = React.createContext<FormContextState>({
+export const FormContext = React.createContext<FormContextState<any>>({
   formState: new FormState({}),
 });
 
@@ -16,7 +16,7 @@ export const useFormError = (name: string | undefined) => {
   const { formState } = useForm();
 
   useEffect(() => {
-    const unsubscribe = formState.subscribeErrors(name, errors => {
+    const unsubscribe = formState.subscribeErrors(name, (errors: any) => {
       setErrors(errors);
     });
     return unsubscribe;

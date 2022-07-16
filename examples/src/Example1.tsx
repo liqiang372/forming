@@ -5,6 +5,7 @@ export function Example1() {
     <div className="flex flex-col items-start">
       <h2 className="text-2xl">Validate on submit(Only)</h2>
       <Form
+        initialValues={{ email: '', name: '' }}
         validateOnSubmit
         onSubmit={({ values }) => {
           console.log('submitting', values);

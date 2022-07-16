@@ -6,6 +6,7 @@
   "license": "MIT",
   "repository": "liqiang372/forming",
   "main": "dist/index.js",
+  "types": "dist/src/index.d.ts",
   "module": "dist/index.modern.js",
   "source": "src/index.tsx",
   "engines": {

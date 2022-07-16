@@ -2,13 +2,15 @@ import React from 'react';
 import { Form, FormProps } from '../src/Form';
 import { Field } from '../src/Field';
 
-export function BasicForm({
+export function RefForm({
   onSubmit,
+  innerRef,
 }: {
   onSubmit: FormProps<any>['onSubmit'];
+  innerRef: React.Ref<any>;
 }) {
   return (
-    <Form onSubmit={onSubmit}>
+    <Form onSubmit={onSubmit} innerRef={innerRef}>
       <Field name="username">
         {({ value = '', onChange }) => {
           return (

@@ -2,11 +2,11 @@ import { useState, useRef } from 'react';
 import { Form, Field, FormRefProps } from 'forming';
 
 export function Example6() {
-  const formRef = useRef<FormRefProps>(null);
+  const formRef = useRef<FormRefProps<any>>(null);
   return (
     <div className="flex flex-col items-start">
       <h2 className="text-2xl">use outside of form</h2>
-      <Form ref={formRef}>
+      <Form innerRef={formRef}>
         <Field
           name="feedback"
           validate={{
@@ -60,7 +60,6 @@ export function Example6() {
             Reject
           </button>
         </div>
-        ;
       </Form>
     </div>
   );

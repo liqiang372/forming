@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { Form, Field, FormRefProps, useFormValue } from 'forming';
 import { useEffect } from 'react';
 
@@ -8,7 +8,7 @@ const FullNameField = ({ value, updateValue }: any) => {
 
   useEffect(() => {
     updateValue(`${firstName ?? ''} ${lastName ?? ''}`);
-  }, [firstName, lastName]);
+  }, [firstName, lastName]); // eslint-disable-line
   return (
     <div className="flex flex-col items-start">
       <label htmlFor="">Last Name</label>
@@ -23,11 +23,11 @@ const FullNameField = ({ value, updateValue }: any) => {
   );
 };
 export function Example7() {
-  const formRef = useRef<FormRefProps>(null);
+  const formRef = useRef<FormRefProps<any>>(null);
   return (
     <div className="flex flex-col items-start">
       <h2 className="text-2xl">Dependent fields</h2>
-      <Form ref={formRef}>
+      <Form innerRef={formRef}>
         <Field name="firstName">
           {({ value = '', onChange, errors }) => {
             return (

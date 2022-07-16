@@ -2,7 +2,11 @@ import React from 'react';
 import { Form, FormProps } from '../src/Form';
 import { Field } from '../src/Field';
 
-export function ArrayForm({ onSubmit }: { onSubmit: FormProps['onSubmit'] }) {
+export function ArrayForm({
+  onSubmit,
+}: {
+  onSubmit: FormProps<any>['onSubmit'];
+}) {
   return (
     <Form
       onSubmit={onSubmit}
