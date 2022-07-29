@@ -36,6 +36,18 @@ export const Form = <T extends FormInitialValues>({
       getValue: (name: string) => {
         return formState.current.getValue(name);
       },
+      updateValue: (
+        name: string,
+        value: any,
+        { shouldValidate }: { shouldValidate?: boolean } = {
+          shouldValidate: true,
+        },
+      ) => {
+        formState.current.setValue(name, value);
+        if (shouldValidate) {
+          formState.current.validate(name);
+        }
+      },
       getErrors: () => {
         return formState.current.getErrors();
       },
