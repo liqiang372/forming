@@ -1,7 +1,8 @@
+import { Pubsub } from './pubsub';
 import { FormInitialValues, ValidationLevel } from './types';
 import { isEmpty, parsePath } from './utils';
 
-const ALL_KEY = Symbol('all');
+const ALL_KEY = Symbol('all') as any;
 export class FormState<T extends FormInitialValues> {
   options: {
     initialValues: T;
@@ -10,10 +11,8 @@ export class FormState<T extends FormInitialValues> {
   private values: T;
   private validateRules: Record<string, any>;
   private errors: Record<string, any>;
-  private listeners: Record<
-    string | symbol,
-    { errors: ((errors: string[]) => void)[]; values: ((value: any) => void)[] }
-  >;
+  private valueListeners: Pubsub;
+  private errorListeners: Pubsub;
   constructor({
     initialValues = {} as T,
     validationLevel = 'first',
@@ -28,7 +27,8 @@ export class FormState<T extends FormInitialValues> {
     this.values = initialValues;
     this.validateRules = {};
     this.errors = {};
-    this.listeners = {};
+    this.valueListeners = new Pubsub();
+    this.errorListeners = new Pubsub();
   }
 
   setValue(rawName: string, value: any) {
@@ -40,9 +40,7 @@ export class FormState<T extends FormInitialValues> {
     // @ts-ignore
     tmp[paths[paths.length - 1]] = value;
     // TODO: deal with array or object
-    for (const listener of this.listeners[rawName]?.values ?? []) {
-      listener(value);
-    }
+    this.valueListeners.publish(rawName, value);
   }
   getValue(rawName: string): any {
     const paths = parsePath(rawName);
@@ -70,45 +68,15 @@ export class FormState<T extends FormInitialValues> {
   }
 
   subscribeErrors(name: string | undefined, fn: (errors: any[]) => void) {
-    return this.subscribe(name, 'errors', fn);
+    this.errorListeners.subscribe(name ?? ALL_KEY, fn);
   }
 
   subscribeValues(name: string | undefined, fn: (values: any[]) => void) {
-    return this.subscribe(name, 'values', fn);
-  }
-
-  private subscribe(
-    name: string | undefined,
-    category: 'errors' | 'values',
-    fn: (val: any) => void,
-  ) {
-    const key = name ?? (ALL_KEY as any);
-    if (!this.listeners[key]) {
-      this.listeners[key] = { errors: [], values: [] };
-    }
-    if (!this.listeners[key][category]) {
-      this.listeners[key][category] = [];
-    }
-
-    this.listeners[key][category].push(fn);
-    return () => {
-      let i = 0;
-      while (i < this.listeners[key][category].length) {
-        const listener = this.listeners[key][category][i];
-        if (listener === fn) {
-          break;
-        }
-        i++;
-      }
-      this.listeners[key][category].splice(i, 1);
-    };
+    this.valueListeners.subscribe(name ?? ALL_KEY, fn);
   }
 
   notifyErrors(name: string) {
-    const subs = this.listeners[name];
-    for (const sub of subs.errors) {
-      sub(this.errors[name]);
-    }
+    this.errorListeners.publish(name, this.errors[name]);
   }
 
   setValidateRules(name: string, rules: any) {

@@ -28,6 +28,19 @@ export const Form = <T extends FormInitialValues>({
   innerRef,
 }: FormProps<T> & { innerRef?: React.Ref<FormRefProps<T>> }) => {
   const formState = useRef<FormState<T>>(new FormState({ initialValues }));
+  const doSubmit = async () => {
+    if (validateOnSubmit) {
+      await formState.current.validateAll();
+    } else if (validateOnSubmitSyncOnly) {
+      await formState.current.validateAll({
+        syncOnly: true,
+      });
+    }
+    const hasErrors = Object.keys(formState.current.getErrors()).length > 0;
+    if (!hasErrors) {
+      onSubmit?.({ values: formState.current.getValues() });
+    }
+  };
   useImperativeHandle(innerRef, () => {
     return {
       getValues: () => {
@@ -48,6 +61,7 @@ export const Form = <T extends FormInitialValues>({
           formState.current.validate(name);
         }
       },
+      submitForm: doSubmit,
       getErrors: () => {
         return formState.current.getErrors();
       },
@@ -62,17 +76,7 @@ export const Form = <T extends FormInitialValues>({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (validateOnSubmit) {
-      await formState.current.validateAll();
-    } else if (validateOnSubmitSyncOnly) {
-      await formState.current.validateAll({
-        syncOnly: true,
-      });
-    }
-    const hasErrors = Object.keys(formState.current.getErrors()).length > 0;
-    if (!hasErrors) {
-      onSubmit?.({ values: formState.current.getValues() });
-    }
+    doSubmit();
   };
 
   return (
