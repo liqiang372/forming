@@ -12,7 +12,7 @@ export interface FormProps<Values> {
   onSubmit?: (params: { values: Values }) => void;
 }
 
-export type FormRefProps<T> = Pick<
+export type FormRefProps<T extends FormInitialValues> = Pick<
   FormState<T>,
   'getErrors' | 'getValue' | 'getValues' | 'validate' | 'validateAll'
 >;

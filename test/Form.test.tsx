@@ -3,6 +3,7 @@ import { render, fireEvent, screen } from '@testing-library/react';
 import { BasicForm } from './BasicForm';
 import { ArrayForm } from './ArrayForm';
 import { RefForm } from './RefForm';
+import { DependentForm } from './DependentForm';
 
 describe('Form', () => {
   test('basic', async () => {
@@ -207,5 +208,28 @@ describe('ref', () => {
     expect(ref.current.getValue('username')).toBe('foo');
     expect(ref.current.getValue('password')).toBe('123456');
     expect(ref.current.validate('username')).toBeTruthy();
+  });
+});
+
+describe('useFormValue', () => {
+  test('able subscribe to value', async () => {
+    const onSubmitMock = jest.fn();
+    const utils = render(<DependentForm onSubmit={onSubmitMock} />);
+    const fullNameField = utils.getByLabelText(
+      'fullName-field',
+    ) as HTMLDivElement;
+    expect(fullNameField.textContent).toBe('Kokuul');
+    const firstNameInput = utils.getByLabelText(
+      'firstName-input',
+    ) as HTMLInputElement;
+    fireEvent.change(firstNameInput, { target: { value: 'Kokul' } });
+    expect(firstNameInput.value).toBe('Kokul');
+
+    const lastNameField = utils.getByLabelText(
+      'lastName-input',
+    ) as HTMLInputElement;
+    fireEvent.change(lastNameField, { target: { value: 'Subendran' } });
+    expect(lastNameField.value).toBe('Subendran');
+    expect(fullNameField.textContent).toBe('Kokul Subendran');
   });
 });
