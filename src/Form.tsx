@@ -10,6 +10,7 @@ export interface FormProps<Values> {
   htmlValidate?: boolean;
   children: React.ReactNode;
   onSubmit?: (params: { values: Values }) => void;
+  className?: string;
 }
 
 export type FormRefProps<T extends FormInitialValues> = Pick<
@@ -26,6 +27,7 @@ export const Form = <T extends FormInitialValues>({
   validateOnSubmitSyncOnly,
   onSubmit,
   innerRef,
+  className,
 }: FormProps<T> & { innerRef?: React.Ref<FormRefProps<T>> }) => {
   const formState = useRef<FormState<T>>(new FormState({ initialValues }));
   const doSubmit = async () => {
@@ -81,7 +83,11 @@ export const Form = <T extends FormInitialValues>({
 
   return (
     <FormContext.Provider value={{ formState: formState.current }}>
-      <form onSubmit={handleSubmit} noValidate={!htmlValidate}>
+      <form
+        onSubmit={handleSubmit}
+        noValidate={!htmlValidate}
+        className={className}
+      >
         {children}
       </form>
     </FormContext.Provider>
