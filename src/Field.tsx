@@ -32,7 +32,7 @@ export function Field({
   const { formState } = useForm();
   const errors = useFormError(name);
   const initialValue = formState.getValue(name);
-  const [value, setValue] = useState<any>(initialValue ?? '');
+  const [_, setValue] = useState<any>(initialValue ?? '');
   const [isValidating, setIsValidating] = useState(false);
   const validateFn = validateDebouncedTime
     ? useDebouncedCallback(async () => {

@@ -1,8 +1,8 @@
 import { Pubsub } from './pubsub';
-import { FormInitialValues, ValidationLevel } from './types';
-import { isEmpty, parsePath } from './utils';
+import { FieldError, FormInitialValues, ValidationLevel } from './types';
+import { areSameErrors, isEmpty, parsePath } from './utils';
 
-const ALL_KEY = Symbol('all') as any;
+export const ALL_KEY = Symbol('all') as any;
 export class FormState<T extends FormInitialValues> {
   options: {
     initialValues: T;
@@ -41,6 +41,7 @@ export class FormState<T extends FormInitialValues> {
     tmp[paths[paths.length - 1]] = value;
     // TODO: deal with array or object
     this.valueListeners.publish(rawName, value);
+    this.valueListeners.publish(ALL_KEY, value, rawName);
   }
   getValue(rawName: string): any {
     const paths = parsePath(rawName);
@@ -58,25 +59,35 @@ export class FormState<T extends FormInitialValues> {
     return this.errors;
   }
 
-  updateErrors(name: string, errors: any[] | undefined) {
+  updateErrors(name: string, errors: FieldError[] | undefined) {
+    const prevErrors = this.errors[name];
     if (errors === undefined || errors.length === 0) {
       delete this.errors[name];
     } else {
       this.errors[name] = errors;
     }
-    this.notifyErrors(name);
+    if (!areSameErrors(prevErrors, errors)) {
+      this.notifyErrors(name);
+    }
   }
 
-  subscribeErrors(name: string | undefined, fn: (errors: any[]) => void) {
-    this.errorListeners.subscribe(name ?? ALL_KEY, fn);
+  subscribeErrors(
+    name: string | undefined,
+    fn: (errors: any[], fieldName: string | undefined) => void,
+  ) {
+    return this.errorListeners.subscribe(name ?? ALL_KEY, fn);
   }
 
-  subscribeValues(name: string | undefined, fn: (values: any[]) => void) {
-    this.valueListeners.subscribe(name ?? ALL_KEY, fn);
+  subscribeValues(
+    name: string | undefined,
+    fn: (values: any[], fieldName?: string) => void,
+  ) {
+    return this.valueListeners.subscribe(name ?? ALL_KEY, fn);
   }
 
   notifyErrors(name: string) {
     this.errorListeners.publish(name, this.errors[name]);
+    this.errorListeners.publish(ALL_KEY, this.errors[name], name);
   }
 
   setValidateRules(name: string, rules: any) {

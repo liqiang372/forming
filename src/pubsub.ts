@@ -1,4 +1,4 @@
-type Fn = (val: any) => void;
+type Fn = (...val: any[]) => void;
 // rollup (rpt2 plugin) not working with symbol index
 // type Key = string | symbol;
 type Key = string;
@@ -13,12 +13,15 @@ export class Pubsub {
       this.listeners[name] = [];
     }
     this.listeners[name].push(fn);
+    return () => {
+      this.unsubscribe(name, fn);
+    };
   }
 
-  publish(name: Key, val: any) {
+  publish(name: Key, ...vals: any[]) {
     const fns = this.listeners[name] ?? [];
     for (const fn of fns) {
-      fn(val);
+      fn(...vals);
     }
   }
 

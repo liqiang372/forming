@@ -10,13 +10,13 @@ import { Example7 } from './Example7';
 function App() {
   return (
     <div className="App">
-      <Example1 />
+      {/* <Example1 />
       <Example2 />
       <Example3 />
-      <Example4 />
+      <Example4 /> */}
       <Example5 />
-      <Example6 />
-      <Example7 />
+      {/* <Example6 />
+      <Example7 /> */}
     </div>
   );
 }

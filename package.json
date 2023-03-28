@@ -1,7 +1,7 @@
 {
   "name": "forming",
   "version": "0.0.14",
-  "description": "Build forms with smile",
+  "description": "Build form with least re-renders!",
   "author": "liqiang372",
   "license": "MIT",
   "repository": "liqiang372/forming",

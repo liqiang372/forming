@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { Form, Field } from 'forming';
+import {
+  Form,
+  Field,
+  useFormErrors,
+  useFormChanged,
+  useFormValues,
+} from 'forming';
 
 function checkUsername(name: string) {
   return new Promise((resolve, reject) => {
@@ -14,6 +20,12 @@ function checkUsername(name: string) {
   });
 }
 function SubmitBtn() {
+  const errors = useFormErrors(['email']);
+  const changes = useFormChanged();
+  const selected = useFormValues(['username']);
+  const selected2 = useFormValues(['username', 'email']);
+  const all = useFormValues();
+  console.log({ errors, changes, selected, selected2, all });
   return (
     <button type="submit" className="btn">
       Submit
