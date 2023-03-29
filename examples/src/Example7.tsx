@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 const FullNameField = ({ value, updateValue }: any) => {
   const firstName = useFormValue('firstName');
   const lastName = useFormValue('lastName');
+  console.log({ firstName, lastName });
 
   useEffect(() => {
     updateValue(`${firstName ?? ''} ${lastName ?? ''}`);
@@ -27,7 +28,10 @@ export function Example7() {
   return (
     <div className="flex flex-col items-start">
       <h2 className="text-2xl">Dependent fields</h2>
-      <Form innerRef={formRef}>
+      <Form
+        innerRef={formRef}
+        initialValues={{ firstName: 'hi', lastName: 'what' }}
+      >
         <Field name="firstName">
           {({ value = '', onChange, errors }) => {
             return (

@@ -58,12 +58,8 @@ export const useFormErrors = (names?: string[]) => {
 };
 
 export const useFormValue = (name: string) => {
-  const [value, setValue] = useState<undefined | any>(undefined);
   const { formState } = useForm();
-  useEffect(() => {
-    const initialValue = formState.getValue(name);
-    setValue(initialValue);
-  }, []);
+  const [value, setValue] = useState<undefined | any>(formState.getValue(name));
 
   useEffect(() => {
     const unsubscribe = formState.subscribeValues(name, value => {
