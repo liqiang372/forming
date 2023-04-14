@@ -1,6 +1,6 @@
 {
   "name": "forming",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "Build form with least re-renders!",
   "author": "liqiang372",
   "license": "MIT",
