@@ -1,4 +1,9 @@
-import React, { FormEvent, useRef, useImperativeHandle } from 'react';
+import React, {
+  FormEvent,
+  useState,
+  useImperativeHandle,
+  useMemo,
+} from 'react';
 import { FormContext } from './FormContext';
 import { FormState } from './FormState';
 import { FormInitialValues } from './types';
@@ -29,27 +34,29 @@ export const Form = <T extends FormInitialValues>({
   innerRef,
   className,
 }: FormProps<T> & { innerRef?: React.Ref<FormRefProps<T>> }) => {
-  const formState = useRef<FormState<T>>(new FormState({ initialValues }));
+  const [formState] = useState<FormState<T>>(
+    () => new FormState({ initialValues }),
+  );
   const doSubmit = async () => {
     if (validateOnSubmit) {
-      await formState.current.validateAll();
+      await formState.validateAll();
     } else if (validateOnSubmitSyncOnly) {
-      await formState.current.validateAll({
+      await formState.validateAll({
         syncOnly: true,
       });
     }
-    const hasErrors = Object.keys(formState.current.getErrors()).length > 0;
+    const hasErrors = Object.keys(formState.getErrors()).length > 0;
     if (!hasErrors) {
-      onSubmit?.({ values: formState.current.getValues() });
+      onSubmit?.({ values: formState.getValues() });
     }
   };
   useImperativeHandle(innerRef, () => {
     return {
       getValues: () => {
-        return formState.current.getValues();
+        return formState.getValues();
       },
       getValue: (name: string) => {
-        return formState.current.getValue(name);
+        return formState.getValue(name);
       },
       updateValue: (
         name: string,
@@ -58,20 +65,20 @@ export const Form = <T extends FormInitialValues>({
           shouldValidate: true,
         },
       ) => {
-        formState.current.setValue(name, value);
+        formState.setValue(name, value);
         if (shouldValidate) {
-          formState.current.validate(name);
+          formState.validate(name);
         }
       },
       submitForm: doSubmit,
       getErrors: () => {
-        return formState.current.getErrors();
+        return formState.getErrors();
       },
       validate: (name: string) => {
-        return formState.current.validate(name);
+        return formState.validate(name);
       },
       validateAll: () => {
-        return formState.current.validateAll();
+        return formState.validateAll();
       },
     };
   });
@@ -81,8 +88,14 @@ export const Form = <T extends FormInitialValues>({
     doSubmit();
   };
 
+  const context = useMemo(() => {
+    return {
+      formState,
+    };
+  }, []);
+
   return (
-    <FormContext.Provider value={{ formState: formState.current }}>
+    <FormContext.Provider value={context}>
       <form
         onSubmit={handleSubmit}
         noValidate={!htmlValidate}
