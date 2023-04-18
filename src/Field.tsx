@@ -45,7 +45,6 @@ export function Field({
         formState.validate(name);
       }, []);
   useEffect(() => {
-    formState.resetError(name);
     if (validateOnMount || validateFieldsOnMount) {
       validateFn(name);
     }

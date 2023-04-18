@@ -20,15 +20,15 @@ function checkUsername(name: string) {
   });
 }
 function SubmitBtn() {
-  const errors = useFormErrors(['email']);
-  const changes = useFormChanged();
-  const selected = useFormValues(['username']);
-  const selected2 = useFormValues(['username', 'email']);
-  const all = useFormValues();
-  console.log({ errors, changes, selected, selected2, all });
+  const errors = useFormErrors();
+  const hasError = errors && Object.keys(errors).length > 0;
   return (
-    <button type="submit" className="btn">
-      Submit
+    <button
+      type="submit"
+      className="btn"
+      disabled={errors && Object.keys(errors).length > 0}
+    >
+      {hasError ? 'error' : 'Submit'}
     </button>
   );
 }
@@ -82,8 +82,8 @@ export function Example8() {
             name="username"
             validate={{
               minLen: (val: string) => {
-                if (val.length < 2) {
-                  return 'Minimum length is 2';
+                if (val.length < 6) {
+                  return 'Minimum length is 6';
                 }
 
                 return ''; // or return true
@@ -97,7 +97,6 @@ export function Example8() {
               },
             }}
             validateOnChange
-            validateOnMount
           >
             {({ value = '', onChange, errors, isValidating }) => {
               return (
@@ -118,7 +117,7 @@ export function Example8() {
           </Field>
         )}
 
-        <SubmitBtn />
+        {showField && <SubmitBtn />}
       </Form>
 
       <button

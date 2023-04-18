@@ -13,9 +13,11 @@ export const FormContext = React.createContext<FormContextState<any>>({
 
 export const useForm = () => React.useContext(FormContext);
 
-export const useFormError = (name: string | undefined) => {
-  const [errors, setErrors] = useState<undefined | FieldError[]>(undefined);
+export const useFormError = (name: string) => {
   const { formState } = useForm();
+  const [errors, setErrors] = useState<undefined | FieldError[]>(
+    formState.getErrors()[name],
+  );
   useEffect(() => {
     const unsubscribe = formState.subscribeErrors(name, (errors: any) => {
       setErrors(errors);
@@ -26,11 +28,21 @@ export const useFormError = (name: string | undefined) => {
 };
 
 export const useFormErrors = (names?: string[]) => {
-  const [errors, setErrors] = useState<
-    undefined | Record<string, FieldError[]>
-  >(undefined);
   const { formState } = useForm();
   const keys = names && names.length !== 0 ? names : [ALL_KEY];
+  const [errors, setErrors] = useState<
+    undefined | Record<string, FieldError[]>
+  >(() => {
+    const allErrors = formState.getErrors();
+    if (keys.length === 1 && keys[0] === ALL_KEY) {
+      return allErrors;
+    }
+    const picked = {};
+    for (const name of keys) {
+      picked[name] = allErrors[name];
+    }
+    return picked;
+  });
   useEffect(() => {
     const unsubscribeFns = keys.map(name =>
       formState.subscribeErrors(name, (errors, fieldName) => {
@@ -73,22 +85,19 @@ export const useFormValue = (name: string) => {
 };
 
 export const useFormValues = (names?: string[]) => {
-  const [values, setValues] = useState<Record<string, any>>({});
   const { formState } = useForm();
   const keys = names && names.length !== 0 ? names : [ALL_KEY];
-  useEffect(() => {
+  const [values, setValues] = useState<Record<string, any>>(() => {
     const initialValues = formState.getValues();
     if (keys.length === 1 && keys[0] === ALL_KEY) {
-      setValues(initialValues);
-    } else {
-      const picked = {};
-      for (const name of keys) {
-        picked[name] = initialValues[name];
-      }
-      setValues(picked);
+      return initialValues;
     }
-  }, []);
-
+    const picked = {};
+    for (const name of keys) {
+      picked[name] = initialValues[name];
+    }
+    return picked;
+  });
   useEffect(() => {
     const unsubscribeFns = keys.map(name =>
       formState.subscribeValues(name, (value, fieldName) => {
