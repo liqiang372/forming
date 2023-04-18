@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Form,
   Field,
@@ -21,6 +21,7 @@ function checkUsername(name: string) {
 }
 function SubmitBtn() {
   const errors = useFormErrors();
+  console.log({ errors: JSON.stringify(errors) });
   const hasError = errors && Object.keys(errors).length > 0;
   return (
     <button
@@ -56,11 +57,16 @@ export function Example8() {
           name="email"
           validate={{
             required: 'Email is required',
-            random: () => {
+            random: val => {
               console.log('validating');
 
               if (showField) {
-                return 'show field ';
+                if (val.length < 5) {
+                  return 'length less than 5';
+                }
+                return '';
+              } else {
+                return 'field not shown';
               }
               if (flag2) {
                 return 'flag2';
@@ -72,6 +78,7 @@ export function Example8() {
           validateOnDeps={[showField, flag2]}
         >
           {({ value = '', onChange, errors }) => {
+            console.log({ emailError: JSON.stringify(errors) });
             return (
               <div className="flex flex-col items-start">
                 <label htmlFor="">
@@ -89,48 +96,9 @@ export function Example8() {
             );
           }}
         </Field>
-        {showField && (
-          <Field
-            validateDebouncedTime={300}
-            name="username"
-            validate={{
-              minLen: (val: string) => {
-                if (val.length < 6) {
-                  return 'Minimum length is 6';
-                }
+        {showField && <div>123</div>}
 
-                return ''; // or return true
-              },
-              valid: async (val: string) => {
-                const result = await checkUsername(val);
-                if (result === 'valid') {
-                  return '';
-                }
-                return 'invalid';
-              },
-            }}
-            validateOnChange
-          >
-            {({ value = '', onChange, errors, isValidating }) => {
-              return (
-                <div className="flex flex-col items-start">
-                  <label htmlFor="">Username</label>
-                  <input
-                    value={value}
-                    onChange={onChange}
-                    className="border border-black border-solid"
-                  />
-                  {errors && errors.length > 0 && (
-                    <div className="text-red-500">{errors[0].message}</div>
-                  )}
-                  {isValidating && <div>is validating</div>}
-                </div>
-              );
-            }}
-          </Field>
-        )}
-
-        {showField && <SubmitBtn />}
+        {<SubmitBtn />}
       </Form>
 
       <button

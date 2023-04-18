@@ -79,7 +79,10 @@ export class FormState<T extends FormInitialValues> {
     name: string | undefined,
     fn: (errors: any[], fieldName: string | undefined) => void,
   ) {
-    return this.errorListeners.subscribe(name ?? ALL_KEY, fn);
+    const key = name ?? ALL_KEY;
+    const unsub = this.errorListeners.subscribe(name ?? ALL_KEY, fn);
+    this.notifyErrors(key);
+    return unsub;
   }
 
   subscribeValues(

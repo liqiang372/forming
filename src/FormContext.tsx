@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FormState, ALL_KEY } from './FormState';
 import { FieldError, FormInitialValues } from './types';
 
@@ -23,7 +23,7 @@ export const useFormError = (name: string) => {
       setErrors(errors);
     });
     return unsubscribe;
-  });
+  }, []);
   return errors;
 };
 
@@ -67,7 +67,7 @@ export const useFormErrors = (names?: string[]) => {
         fn();
       }
     };
-  });
+  }, []);
   return errors;
 };
 
