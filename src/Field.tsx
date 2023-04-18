@@ -20,6 +20,7 @@ export interface FieldProps {
   validateOnBlur?: boolean;
   validateDebouncedTime?: number;
   validateOnMount?: boolean;
+  validateOnDeps?: any[];
 }
 
 export function Field({
@@ -28,13 +29,16 @@ export function Field({
   validate,
   validateOnBlur = false,
   validateOnChange = false,
-  validateOnMount = false,
+  validateOnMount,
   validateDebouncedTime,
+  validateOnDeps = [],
 }: FieldProps) {
   const { formState, validateFieldsOnMount } = useForm();
   const initialValue = formState.getValue(name);
   const [_, setValue] = useState<any>(initialValue ?? '');
   const [isValidating, setIsValidating] = useState(false);
+  const errors = useFormError(name);
+  const shouldValidateOnMount = validateOnMount ?? validateFieldsOnMount;
   const validateFn = validateDebouncedTime
     ? useDebouncedCallback(async () => {
         setIsValidating(true);
@@ -44,11 +48,6 @@ export function Field({
     : useCallback((name: string) => {
         formState.validate(name);
       }, []);
-  useEffect(() => {
-    if (validateOnMount || validateFieldsOnMount) {
-      validateFn(name);
-    }
-  }, []); // eslint-disable-line
 
   useEffect(() => {
     if (validate) {
@@ -56,7 +55,20 @@ export function Field({
     }
   }, [validate, name]);
 
-  const errors = useFormError(name);
+  useEffect(() => {
+    // If both validateOnMount and validateOnDeps are set, optimize so that it only validate once
+    if (shouldValidateOnMount) {
+      if (validateOnDeps.length === 0) {
+        validateFn(name);
+      }
+    }
+  }, []); // eslint-disable-line
+
+  useEffect(() => {
+    if (validateOnDeps.length > 0 && validate) {
+      validateFn(name);
+    }
+  }, validateOnDeps);
 
   const onChange = (e: React.ChangeEvent<any>) => {
     e.stopPropagation();
