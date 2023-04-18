@@ -59,6 +59,10 @@ export class FormState<T extends FormInitialValues> {
     return this.errors;
   }
 
+  resetError(name: string) {
+    delete this.errors[name];
+  }
+
   updateErrors(name: string, errors: FieldError[] | undefined) {
     const prevErrors = this.errors[name];
     if (errors === undefined || errors.length === 0) {

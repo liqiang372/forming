@@ -12,10 +12,12 @@ export interface FormProps<Values> {
   initialValues?: Values;
   validateOnSubmit?: boolean;
   validateOnSubmitSyncOnly?: boolean;
+  validateFieldsOnMount?: boolean;
   htmlValidate?: boolean;
   children: React.ReactNode;
   onSubmit?: (params: { values: Values }) => void;
   className?: string;
+  validateOnMount?: boolean;
 }
 
 export type FormRefProps<T extends FormInitialValues> = Pick<
@@ -28,7 +30,8 @@ export const Form = <T extends FormInitialValues>({
   initialValues,
   children,
   htmlValidate = false,
-  validateOnSubmit,
+  validateOnSubmit = false,
+  validateFieldsOnMount = false,
   validateOnSubmitSyncOnly,
   onSubmit,
   innerRef,
@@ -91,8 +94,9 @@ export const Form = <T extends FormInitialValues>({
   const context = useMemo(() => {
     return {
       formState,
+      validateFieldsOnMount,
     };
-  }, []);
+  }, [validateFieldsOnMount]);
 
   return (
     <FormContext.Provider value={context}>

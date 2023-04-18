@@ -19,6 +19,7 @@ export interface FieldProps {
   validateOnChange?: boolean;
   validateOnBlur?: boolean;
   validateDebouncedTime?: number;
+  validateOnMount?: boolean;
 }
 
 export function Field({
@@ -27,10 +28,10 @@ export function Field({
   validate,
   validateOnBlur = false,
   validateOnChange = false,
+  validateOnMount = false,
   validateDebouncedTime,
 }: FieldProps) {
-  const { formState } = useForm();
-  const errors = useFormError(name);
+  const { formState, validateFieldsOnMount } = useForm();
   const initialValue = formState.getValue(name);
   const [_, setValue] = useState<any>(initialValue ?? '');
   const [isValidating, setIsValidating] = useState(false);
@@ -43,12 +44,20 @@ export function Field({
     : useCallback((name: string) => {
         formState.validate(name);
       }, []);
+  useEffect(() => {
+    formState.resetError(name);
+    if (validateOnMount || validateFieldsOnMount) {
+      validateFn(name);
+    }
+  }, []); // eslint-disable-line
 
   useEffect(() => {
     if (validate) {
       formState.setValidateRules(name, validate);
     }
   }, [validate, name]);
+
+  const errors = useFormError(name);
 
   const onChange = (e: React.ChangeEvent<any>) => {
     e.stopPropagation();

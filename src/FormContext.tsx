@@ -4,9 +4,11 @@ import { FieldError, FormInitialValues } from './types';
 
 export interface FormContextState<T extends FormInitialValues> {
   formState: FormState<T>;
+  validateFieldsOnMount: boolean;
 }
 export const FormContext = React.createContext<FormContextState<any>>({
   formState: new FormState({}),
+  validateFieldsOnMount: false,
 });
 
 export const useForm = () => React.useContext(FormContext);

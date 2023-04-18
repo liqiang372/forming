@@ -6,6 +6,7 @@ import { Example4 } from './Example4';
 import { Example5 } from './Example5';
 import { Example6 } from './Example6';
 import { Example7 } from './Example7';
+import { Example8 } from './Example8';
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
       <Example4 />
       <Example5 />
       <Example6 /> */}
-      <Example7 />
+      <Example8 />
     </div>
   );
 }
